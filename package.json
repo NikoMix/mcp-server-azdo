@@ -1,0 +1,38 @@
+{
+  "name": "@modelcontextprotocol/server-azdo",
+  "version": "0.6.2",
+  "description": "MCP server for using the Azure DevOps API",
+  "license": "MIT",
+  "author": "Niko Mix",
+  "homepage": "https://modelcontextprotocol.io",
+  "bugs": "https://github.com/NikoMix/mcp-server-azdo/issues",
+  "type": "module",
+  "bin": {
+    "mcp-server-azdo": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.9.0",
+    "@types/node": "^22",
+    "@types/node-fetch": "^2.6.12",
+    "node-fetch": "^3.3.2",
+    "universal-user-agent": "^7.0.2",
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.24.5"
+  },
+  "devDependencies": {
+    "shx": "^0.4.0",
+    "typescript": "^5.8.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "@types/jest": "^29.5.11"
+  }
+}
