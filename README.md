@@ -2,6 +2,9 @@
 
 MCP Server for the Azure DevOps Services API, enabling file operations, repository management, search functionality, and more.
 
+> [!WARNING]  
+> This implementation is not yet tested and undergoing active development.
+
 ### Features
 
 - **Automatic Branch Creation**: When creating/updating files or pushing changes, branches are automatically created if they don't exist
@@ -111,18 +114,121 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `project` (string): Azure DevOps project name
     - Returns: Array of artifact details
 
-13. `list_projects`
+13. `list_artifact_feeds`
+    - List artifact feeds in an organization
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+    - Returns: Array of artifact feed details
+
+14. `get_artifact_feed`
+    - Get a specific artifact feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+    - Returns: Artifact feed details
+
+15. `create_artifact_feed`
+    - Create a new artifact feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `name` (string): Feed name
+      - `description` (optional string): Feed description
+      - `project` (optional string): Project ID
+    - Returns: Created feed details
+
+16. `update_artifact_feed`
+    - Update an artifact feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `name` (optional string): New name
+      - `description` (optional string): New description
+    - Returns: Updated feed details
+
+17. `delete_artifact_feed`
+    - Delete an artifact feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+    - Returns: Success status
+
+18. `list_artifact_packages`
+    - List packages in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+    - Returns: Array of package details
+
+19. `get_artifact_package`
+    - Get a specific package in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `packageId` (string): Package ID
+    - Returns: Package details
+
+20. `delete_artifact_package`
+    - Delete a package from a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `packageId` (string): Package ID
+    - Returns: Success status
+
+21. `list_artifact_views`
+    - List views in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+    - Returns: Array of view details
+
+22. `get_artifact_view`
+    - Get a specific view in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `viewId` (string): View ID
+    - Returns: View details
+
+23. `create_artifact_view`
+    - Create a new view in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `name` (string): View name
+      - `description` (optional string): View description
+    - Returns: Created view details
+
+24. `update_artifact_view`
+    - Update a view in a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `viewId` (string): View ID
+      - `name` (optional string): New name
+      - `description` (optional string): New description
+    - Returns: Updated view details
+
+25. `delete_artifact_view`
+    - Delete a view from a feed
+    - Inputs:
+      - `organization` (string): Azure DevOps organization name
+      - `feedId` (string): Feed ID
+      - `viewId` (string): View ID
+    - Returns: Success status
+
+26. `list_projects`
     - List all projects in the organization
     - Inputs: none
     - Returns: Array of project details
 
-14. `get_project`
+27. `get_project`
     - Get details of a specific project
     - Inputs:
       - `id` (string): Project ID or name
     - Returns: Project details
 
-15. `create_project`
+28. `create_project`
     - Create a new project
     - Inputs:
       - `name` (string): Project name
@@ -131,7 +237,7 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `processTemplateId` (string): ID of the process template
     - Returns: Created project details
 
-16. `update_project`
+29. `update_project`
     - Update an existing project
     - Inputs:
       - `id` (string): Project ID
@@ -140,37 +246,37 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `visibility` (optional string): `private` or `public`
     - Returns: Updated project details
 
-17. `delete_project`
+30. `delete_project`
     - Delete a project
     - Inputs:
       - `id` (string): Project ID
     - Returns: Success status
 
-18. `list_process_templates`
+31. `list_process_templates`
     - List all process templates
     - Inputs: none
     - Returns: Array of process template details
 
-19. `get_process_template`
+32. `get_process_template`
     - Get details of a process template
     - Inputs:
       - `id` (string): Process template ID
     - Returns: Process template details
 
-20. `list_iterations`
+33. `list_iterations`
     - List all iterations in a project
     - Inputs:
       - `project` (string): Project name or ID
     - Returns: Array of iteration details
 
-21. `get_iteration`
+34. `get_iteration`
     - Get details of a specific iteration
     - Inputs:
       - `project` (string): Project name or ID
       - `id` (string): Iteration ID
     - Returns: Iteration details
 
-22. `create_iteration`
+35. `create_iteration`
     - Create a new iteration in a project
     - Inputs:
       - `project` (string): Project name or ID
@@ -180,7 +286,7 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `path` (optional string): Path for the iteration
     - Returns: Created iteration details
 
-23. `update_iteration`
+36. `update_iteration`
     - Update an iteration
     - Inputs:
       - `project` (string): Project name or ID
@@ -190,27 +296,27 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `finishDate` (optional string): New finish date
     - Returns: Updated iteration details
 
-24. `delete_iteration`
+37. `delete_iteration`
     - Delete an iteration
     - Inputs:
       - `project` (string): Project name or ID
       - `id` (string): Iteration ID
     - Returns: Success status
 
-25. `list_areas`
+38. `list_areas`
     - List all areas in a project
     - Inputs:
       - `project` (string): Project name or ID
     - Returns: Array of area details
 
-26. `get_area`
+39. `get_area`
     - Get details of a specific area
     - Inputs:
       - `project` (string): Project name or ID
       - `id` (string): Area ID
     - Returns: Area details
 
-27. `create_area`
+40. `create_area`
     - Create a new area in a project
     - Inputs:
       - `project` (string): Project name or ID
@@ -218,7 +324,7 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `path` (optional string): Path for the area
     - Returns: Created area details
 
-28. `update_area`
+41. `update_area`
     - Update an area
     - Inputs:
       - `project` (string): Project name or ID
@@ -227,7 +333,7 @@ MCP Server for the Azure DevOps Services API, enabling file operations, reposito
       - `path` (optional string): New path
     - Returns: Updated area details
 
-29. `delete_area`
+42. `delete_area`
     - Delete an area
     - Inputs:
       - `project` (string): Project name or ID
@@ -256,11 +362,11 @@ To use this with Claude Desktop, add the following to your `claude_desktop_confi
         "-i",
         "--rm",
         "-e",
-        "AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN",
+        "DEVOPS_PERSONAL_ACCESS_TOKEN",
         "mcp/azure-devops"
       ],
       "env": {
-        "AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+        "DEVOPS_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
       }
     }
   }
@@ -279,19 +385,11 @@ To use this with Claude Desktop, add the following to your `claude_desktop_confi
         "@modelcontextprotocol/server-azure-devops"
       ],
       "env": {
-        "AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+        "DEVOPS_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
       }
     }
   }
 }
-```
-
-## Build
-
-Docker build:
-
-```bash
-docker build -t mcp/azure-devops -f src/azure-devops/Dockerfile .
 ```
 
 ## License

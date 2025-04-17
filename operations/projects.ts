@@ -8,7 +8,7 @@ import {
 } from "../common/types.js";
 
 // Schemas for input validation
-export const GetProjectSchema = z.object({ id: z.string() });
+export const GetProjectSchema = z.object({ organization: z.string(), id: z.string() });
 export const CreateProjectSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -23,13 +23,13 @@ export const UpdateProjectSchema = z.object({
 });
 export const DeleteProjectSchema = z.object({ id: z.string() });
 
-export const ListProjectsSchema = z.object({});
+export const ListProjectsSchema = z.object({organization: z.string()});
 
 export const ListProcessTemplatesSchema = z.object({});
-export const GetProcessTemplateSchema = z.object({ id: z.string() });
+export const GetProcessTemplateSchema = z.object({ organization: z.string(),id: z.string() });
 
-export const ListIterationsSchema = z.object({ project: z.string() });
-export const GetIterationSchema = z.object({ project: z.string(), id: z.string() });
+export const ListIterationsSchema = z.object({ organization: z.string(), project: z.string() });
+export const GetIterationSchema = z.object({ organization: z.string(),project: z.string(), id: z.string() });
 export const CreateIterationSchema = z.object({
   project: z.string(),
   name: z.string(),
@@ -62,14 +62,14 @@ export const UpdateAreaSchema = z.object({
 export const DeleteAreaSchema = z.object({ project: z.string(), id: z.string() });
 
 // Project CRUD
-export async function listProjects() {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/projects?api-version=7.0`);
+export async function listProjects(organization: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/projects?api-version=7.0`);
 }
-export async function getProject(id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/projects/${id}?api-version=7.0`);
+export async function getProject(organization: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/projects/${id}?api-version=7.0`);
 }
-export async function createProject(options: z.infer<typeof CreateProjectSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/projects?api-version=7.0`, {
+export async function createProject(organization: string, options: z.infer<typeof CreateProjectSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/projects?api-version=7.0`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -83,36 +83,36 @@ export async function createProject(options: z.infer<typeof CreateProjectSchema>
     }),
   });
 }
-export async function updateProject(id: string, options: z.infer<typeof UpdateProjectSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/projects/${id}?api-version=7.0`, {
+export async function updateProject(organization: string, id: string, options: z.infer<typeof UpdateProjectSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/projects/${id}?api-version=7.0`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(options),
   });
 }
-export async function deleteProject(id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/projects/${id}?api-version=7.0`, {
+export async function deleteProject(organization: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/projects/${id}?api-version=7.0`, {
     method: "DELETE",
   });
 }
 
 // Process templates
-export async function listProcessTemplates() {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/process/processes?api-version=7.0`);
+export async function listProcessTemplates(organization: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/process/processes?api-version=7.0`);
 }
-export async function getProcessTemplate(id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/_apis/process/processes/${id}?api-version=7.0`);
+export async function getProcessTemplate(organization: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/_apis/process/processes/${id}?api-version=7.0`);
 }
 
 // Iterations
-export async function listIterations(project: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/iterations?$depth=10&api-version=7.0`);
+export async function listIterations(organization: string, project: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/iterations?$depth=10&api-version=7.0`);
 }
-export async function getIteration(project: string, id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`);
+export async function getIteration(organization: string, project: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`);
 }
-export async function createIteration(project: string, options: z.infer<typeof CreateIterationSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/iterations?api-version=7.0`, {
+export async function createIteration(organization: string, project: string, options: z.infer<typeof CreateIterationSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/iterations?api-version=7.0`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -125,28 +125,28 @@ export async function createIteration(project: string, options: z.infer<typeof C
     }),
   });
 }
-export async function updateIteration(project: string, id: string, options: z.infer<typeof UpdateIterationSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`, {
+export async function updateIteration(organization: string, project: string, id: string, options: z.infer<typeof UpdateIterationSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(options),
   });
 }
-export async function deleteIteration(project: string, id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`, {
+export async function deleteIteration(organization: string, project: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/iterations/${id}?api-version=7.0`, {
     method: "DELETE",
   });
 }
 
 // Areas
-export async function listAreas(project: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/areas?$depth=10&api-version=7.0`);
+export async function listAreas(organization: string, project: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/areas?$depth=10&api-version=7.0`);
 }
-export async function getArea(project: string, id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`);
+export async function getArea(organization: string, project: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`);
 }
-export async function createArea(project: string, options: z.infer<typeof CreateAreaSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/areas?api-version=7.0`, {
+export async function createArea(organization: string, project: string, options: z.infer<typeof CreateAreaSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/areas?api-version=7.0`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -155,15 +155,15 @@ export async function createArea(project: string, options: z.infer<typeof Create
     }),
   });
 }
-export async function updateArea(project: string, id: string, options: z.infer<typeof UpdateAreaSchema>) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`, {
+export async function updateArea(organization: string, project: string, id: string, options: z.infer<typeof UpdateAreaSchema>) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(options),
   });
 }
-export async function deleteArea(project: string, id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`, {
+export async function deleteArea(organization: string, project: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/classificationnodes/areas/${id}?api-version=7.0`, {
     method: "DELETE",
   });
 }

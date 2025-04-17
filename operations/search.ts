@@ -1,45 +1,58 @@
 import { z } from "zod";
-import { azDoRequest, buildUrl } from "../common/utils.js";
+import { azDoRequest } from "../common/utils.js";
+import {
+  AzdoCodeSearchResponseSchema,
+  AzdoWorkItemSearchResponseSchema,
+  AzdoUserSearchResponseSchema,
+} from "../common/types.js";
 
-export const SearchOptions = z.object({
-  q: z.string(),
-  order: z.enum(["asc", "desc"]).optional(),
-  page: z.number().min(1).optional(),
-  per_page: z.number().min(1).max(100).optional(),
+export const AzdoCodeSearchSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  searchText: z.string(),
+  top: z.number().optional(),
 });
 
-export const SearchUsersOptions = SearchOptions.extend({
-  sort: z.enum(["followers", "repositories", "joined"]).optional(),
+export const AzdoWorkItemSearchSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  searchText: z.string(),
+  top: z.number().optional(),
 });
 
-export const SearchIssuesOptions = SearchOptions.extend({
-  sort: z.enum([
-    "comments",
-    "reactions",
-    "reactions-+1",
-    "reactions--1",
-    "reactions-smile",
-    "reactions-thinking_face",
-    "reactions-heart",
-    "reactions-tada",
-    "interactions",
-    "created",
-    "updated",
-  ]).optional(),
+export const AzdoUserSearchSchema = z.object({
+  organization: z.string(),
+  searchText: z.string(),
+  top: z.number().optional(),
 });
 
-export const SearchCodeSchema = SearchOptions;
-export const SearchUsersSchema = SearchUsersOptions;
-export const SearchIssuesSchema = SearchIssuesOptions;
-
-export async function searchCode(params: z.infer<typeof SearchCodeSchema>) {
-  return azDoRequest(buildUrl("https://api.github.com/search/code", params));
+export async function searchCode(params: z.infer<typeof AzdoCodeSearchSchema>) {
+  const { organization, project, searchText, top } = params;
+  const url = `https://almsearch.dev.azure.com/${organization}/${project}/_apis/search/codesearchresults?api-version=7.1-preview.1`;
+  const body = {
+    searchText,
+    $top: top || 25,
+  };
+  const response = await azDoRequest(url, { method: "POST", body });
+  return AzdoCodeSearchResponseSchema.parse(response);
 }
 
-export async function searchIssues(params: z.infer<typeof SearchIssuesSchema>) {
-  return azDoRequest(buildUrl("https://api.github.com/search/issues", params));
+export async function searchWorkItems(params: z.infer<typeof AzdoWorkItemSearchSchema>) {
+  const { organization, project, searchText, top } = params;
+  const url = `https://almsearch.dev.azure.com/${organization}/${project}/_apis/search/workitemsearchresults?api-version=7.1-preview.1`;
+  const body = {
+    searchText,
+    $top: top || 25,
+  };
+  const response = await azDoRequest(url, { method: "POST", body });
+  return AzdoWorkItemSearchResponseSchema.parse(response);
 }
 
-export async function searchUsers(params: z.infer<typeof SearchUsersSchema>) {
-  return azDoRequest(buildUrl("https://api.github.com/search/users", params));
+export async function searchUsers(params: z.infer<typeof AzdoUserSearchSchema>) {
+  const { organization, searchText, top } = params;
+  const url = `https://vssps.dev.azure.com/${organization}/_apis/graph/users?api-version=7.1-preview.1&$top=${top || 25}&filterValue=${encodeURIComponent(searchText)}`;
+  const response = await azDoRequest(url);
+  const resp: any = response;
+  // Azure DevOps returns 'value' array for users
+  return AzdoUserSearchResponseSchema.parse({ count: resp.count || (resp.value ? resp.value.length : 0), results: resp.value || [] });
 }

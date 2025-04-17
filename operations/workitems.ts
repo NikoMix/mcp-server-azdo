@@ -8,6 +8,8 @@ import {
 } from "../common/types.js";
 
 export const GetWorkItemSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
   id: z.string(),
 });
 
@@ -19,8 +21,12 @@ export const CreateWorkItemOptionsSchema = z.object({
   labels: z.array(AzdoLabelSchema).optional(),
 });
 
+export const CreateWorkItemInputSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+}).merge(CreateWorkItemOptionsSchema);
+
 export const UpdateWorkItemOptionsSchema = z.object({
-  id: z.string(),
   title: z.string().optional(),
   description: z.string().optional(),
   assignees: z.array(AzdoIssueAssigneeSchema).optional(),
@@ -29,16 +35,23 @@ export const UpdateWorkItemOptionsSchema = z.object({
   state: z.enum(["new", "active", "resolved", "closed", "removed"]).optional(),
 });
 
-export async function getWorkItem(id: string) {
-  return azDoRequest(`https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/${id}?api-version=7.0`);
+export const UpdateWorkItemInputSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  id: z.string(),
+}).merge(UpdateWorkItemOptionsSchema);
+
+export async function getWorkItem(organization: string, project: string, id: string) {
+  return azDoRequest(`https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/${id}?api-version=7.0`);
 }
 
 export async function createWorkItem(
+  organization: string,
   project: string,
   options: z.infer<typeof CreateWorkItemOptionsSchema>
 ) {
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/wit/workitems/$task?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/$task?api-version=7.0`,
     {
       method: "POST",
       headers: {
@@ -54,11 +67,13 @@ export async function createWorkItem(
 }
 
 export async function updateWorkItem(
+  organization: string,
+  project: string,
   id: string,
   options: z.infer<typeof UpdateWorkItemOptionsSchema>
 ) {
   return azDoRequest(
-    `https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/${id}?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/${id}?api-version=7.0`,
     {
       method: "PATCH",
       headers: {
@@ -73,9 +88,9 @@ export async function updateWorkItem(
   );
 }
 
-export async function listWorkItems(project: string) {
+export async function listWorkItems(organization: string, project: string) {
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/wit/wiql?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/wit/wiql?api-version=7.0`,
     {
       method: "POST",
       headers: {

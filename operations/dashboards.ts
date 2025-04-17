@@ -4,15 +4,18 @@ import { AzdoDashboardSchema } from "../common/types.js";
 
 // Input schemas
 export const ListDashboardsSchema = z.object({
+  organization: z.string(),
   project: z.string(),
 });
 
 export const GetDashboardSchema = z.object({
+  organization: z.string(),
   project: z.string(),
   dashboardId: z.string(),
 });
 
 export const CreateDashboardSchema = z.object({
+  organization: z.string(),
   project: z.string(),
   name: z.string(),
   widgets: z.array(
@@ -26,6 +29,7 @@ export const CreateDashboardSchema = z.object({
 });
 
 export const UpdateDashboardSchema = z.object({
+  organization: z.string(),
   project: z.string(),
   dashboardId: z.string(),
   name: z.string().optional(),
@@ -43,29 +47,30 @@ export const UpdateDashboardSchema = z.object({
 });
 
 export const DeleteDashboardSchema = z.object({
+  organization: z.string(),
   project: z.string(),
   dashboardId: z.string(),
 });
 
 // Actions
-export async function listDashboards(project: string) {
+export async function listDashboards(organization: string, project: string) {
   // GET https://dev.azure.com/{organization}/{project}/_apis/dashboard/dashboards?api-version=7.0
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards?api-version=7.0`
+    `https://dev.azure.com/${organization}/${project}/_apis/dashboard/dashboards?api-version=7.0`
   );
 }
 
-export async function getDashboard(project: string, dashboardId: string) {
+export async function getDashboard(organization: string, project: string, dashboardId: string) {
   // GET https://dev.azure.com/{organization}/{project}/_apis/dashboard/dashboards/{dashboardId}?api-version=7.0
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`
+    `https://dev.azure.com/${organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`
   );
 }
 
-export async function createDashboard(project: string, options: z.infer<typeof CreateDashboardSchema>) {
-  // POST https://dev.azure.com/{organization}/{project}/_apis/dashboard/dashboards?api-version=7.0
+export async function createDashboard(organization: string, project: string, options: z.infer<typeof CreateDashboardSchema>) {
+  // POST https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards?api-version=7.0
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/dashboard/dashboards?api-version=7.0`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,13 +83,14 @@ export async function createDashboard(project: string, options: z.infer<typeof C
 }
 
 export async function updateDashboard(
+  organization: string,
   project: string,
   dashboardId: string,
   options: z.infer<typeof UpdateDashboardSchema>
 ) {
   // PUT https://dev.azure.com/{organization}/{project}/_apis/dashboard/dashboards/{dashboardId}?api-version=7.0
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -96,10 +102,10 @@ export async function updateDashboard(
   );
 }
 
-export async function deleteDashboard(project: string, dashboardId: string) {
+export async function deleteDashboard(organization: string, project: string, dashboardId: string) {
   // DELETE https://dev.azure.com/{organization}/{project}/_apis/dashboard/dashboards/{dashboardId}?api-version=7.0
   return azDoRequest(
-    `https://dev.azure.com/{organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`,
+    `https://dev.azure.com/${organization}/${project}/_apis/dashboard/dashboards/${dashboardId}?api-version=7.0`,
     {
       method: "DELETE",
     }

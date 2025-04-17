@@ -156,6 +156,55 @@ export const AzdoSearchResponseSchema = z.object({
   items: z.array(AzdoRepositorySchema),
 });
 
+export const AzdoCodeSearchResultSchema = z.object({
+  fileName: z.string(),
+  path: z.string(),
+  repository: AzdoRepositorySchema,
+  project: z.object({
+    id: z.string(),
+    name: z.string(),
+    url: z.string(),
+  }),
+  matches: z.array(z.object({
+    line: z.number(),
+    text: z.string(),
+    offset: z.number(),
+    length: z.number(),
+  })).optional(),
+  url: z.string().optional(),
+});
+
+export const AzdoCodeSearchResponseSchema = z.object({
+  count: z.number(),
+  results: z.array(AzdoCodeSearchResultSchema),
+});
+
+export const AzdoWorkItemSearchResultSchema = z.object({
+  id: z.number(),
+  fields: z.record(z.any()),
+  url: z.string(),
+});
+
+export const AzdoWorkItemSearchResponseSchema = z.object({
+  count: z.number(),
+  results: z.array(AzdoWorkItemSearchResultSchema),
+});
+
+export const AzdoUserSearchResultSchema = z.object({
+  principalName: z.string(),
+  mailAddress: z.string().optional(),
+  displayName: z.string(),
+  originDirectory: z.string().optional(),
+  originId: z.string().optional(),
+  subjectKind: z.string().optional(),
+  url: z.string().optional(),
+});
+
+export const AzdoUserSearchResponseSchema = z.object({
+  count: z.number(),
+  results: z.array(AzdoUserSearchResultSchema),
+});
+
 // Pull request schemas
 export const AzdoPullRequestRefSchema = z.object({
   label: z.string(),
@@ -227,6 +276,52 @@ export const AzdoDashboardSchema = z.object({
   ),
 });
 
+// Dashboard input schemas
+export const ListDashboardsSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+});
+export const GetDashboardSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  dashboardId: z.string(),
+});
+export const CreateDashboardSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  name: z.string(),
+  widgets: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      position: z.object({ row: z.number(), column: z.number() }),
+      size: z.object({ rowSpan: z.number(), columnSpan: z.number() }),
+    })
+  ),
+});
+export const UpdateDashboardSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  dashboardId: z.string(),
+  name: z.string().optional(),
+  widgets: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        name: z.string(),
+        type: z.string(),
+        position: z.object({ row: z.number(), column: z.number() }),
+        size: z.object({ rowSpan: z.number(), columnSpan: z.number() }),
+      })
+    )
+    .optional(),
+});
+export const DeleteDashboardSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  dashboardId: z.string(),
+});
+
 // Query schemas
 export const AzdoQuerySchema = z.object({
   id: z.string(),
@@ -275,6 +370,44 @@ export const AzdoArtifactSchema = z.object({
   url: z.string(),
 });
 
+export const AzdoArtifactFeedSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  fullyQualifiedName: z.string(),
+  url: z.string(),
+  description: z.string().optional(),
+  badgesEnabled: z.boolean().optional(),
+  defaultViewId: z.string().optional(),
+  project: z.object({
+    id: z.string(),
+    name: z.string(),
+    url: z.string(),
+  }).optional(),
+});
+
+export const AzdoArtifactPackageSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  protocolType: z.string(),
+  versions: z.array(z.object({
+    id: z.string(),
+    version: z.string(),
+    isLatest: z.boolean().optional(),
+    isListed: z.boolean().optional(),
+    views: z.array(z.string()).optional(),
+  })).optional(),
+  url: z.string(),
+  description: z.string().optional(),
+});
+
+export const AzdoArtifactViewSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  url: z.string(),
+  type: z.string().optional(),
+  description: z.string().optional(),
+});
+
 // Project schemas
 export const AzdoProjectSchema = z.object({
   id: z.string(),
@@ -315,6 +448,41 @@ export const AzdoAreaSchema = z.object({
   url: z.string(),
 });
 
+// Add or update schemas for work item input
+export const GetWorkItemSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  id: z.string(),
+});
+
+export const CreateWorkItemOptionsSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  assignees: z.array(AzdoIssueAssigneeSchema).optional(),
+  milestone: AzdoMilestoneSchema.optional(),
+  labels: z.array(AzdoLabelSchema).optional(),
+});
+
+export const CreateWorkItemInputSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+}).merge(CreateWorkItemOptionsSchema);
+
+export const UpdateWorkItemOptionsSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  assignees: z.array(AzdoIssueAssigneeSchema).optional(),
+  milestone: AzdoMilestoneSchema.optional(),
+  labels: z.array(AzdoLabelSchema).optional(),
+  state: z.enum(["new", "active", "resolved", "closed", "removed"]).optional(),
+});
+
+export const UpdateWorkItemInputSchema = z.object({
+  organization: z.string(),
+  project: z.string(),
+  id: z.string(),
+}).merge(UpdateWorkItemOptionsSchema);
+
 // Export types
 export type AzdoAuthor = z.infer<typeof AzdoAuthorSchema>;
 export type AzdoRepository = z.infer<typeof AzdoRepositorySchema>;
@@ -337,7 +505,16 @@ export type AzdoQuery = z.infer<typeof AzdoQuerySchema>;
 export type AzdoTestCase = z.infer<typeof AzdoTestCaseSchema>;
 export type AzdoTestPlan = z.infer<typeof AzdoTestPlanSchema>;
 export type AzdoArtifact = z.infer<typeof AzdoArtifactSchema>;
+export type AzdoArtifactFeed = z.infer<typeof AzdoArtifactFeedSchema>;
+export type AzdoArtifactPackage = z.infer<typeof AzdoArtifactPackageSchema>;
+export type AzdoArtifactView = z.infer<typeof AzdoArtifactViewSchema>;
 export type AzdoProject = z.infer<typeof AzdoProjectSchema>;
 export type AzdoProcessTemplate = z.infer<typeof AzdoProcessTemplateSchema>;
 export type AzdoIteration = z.infer<typeof AzdoIterationSchema>;
 export type AzdoArea = z.infer<typeof AzdoAreaSchema>;
+export type AzdoCodeSearchResult = z.infer<typeof AzdoCodeSearchResultSchema>;
+export type AzdoCodeSearchResponse = z.infer<typeof AzdoCodeSearchResponseSchema>;
+export type AzdoWorkItemSearchResult = z.infer<typeof AzdoWorkItemSearchResultSchema>;
+export type AzdoWorkItemSearchResponse = z.infer<typeof AzdoWorkItemSearchResponseSchema>;
+export type AzdoUserSearchResult = z.infer<typeof AzdoUserSearchResultSchema>;
+export type AzdoUserSearchResponse = z.infer<typeof AzdoUserSearchResponseSchema>;
