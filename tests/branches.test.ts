@@ -3,23 +3,24 @@ import * as branches from '../operations/branches.js';
 // Mock azDoRequest from utils
 jest.mock('../common/utils.js', () => ({
   azDoRequest: jest.fn(async (...args) => {
-    // Simulate different responses based on URL
     const url = args[0];
-    if (url.includes('/_apis/git/repositories/') && url.includes('?api-version=7.1-preview.1')) {
-      if (url.includes('/refs?filter=heads/')) {
-        // getBranchObjectId
-        return { value: [{ name: 'refs/heads/branch', objectId: 'mocksha' }] };
-      }
-      if (url.match(/\/repositories\/[^/]+\?api-version/)) {
-        // getDefaultBranchObjectId
-        return { defaultBranch: 'refs/heads/main' };
-      }
-      if (url.includes('/refs?api-version=7.1-preview.1')) {
-        // createAzdoBranch or updateAzdoBranch
-        return { value: [{ name: 'refs/heads/feature', objectId: 'mocksha' }] };
-      }
+    // Always return a branch for 'main' and 'fromBranch' to prevent 'Branch not found' errors
+    if (url.includes('/refs?filter=heads/')) {
+      // Always return 'mocksha' for main and fromBranch to match test expectations
+      return { value: [
+        { name: 'refs/heads/main', objectId: 'mocksha' },
+        { name: 'refs/heads/fromBranch', objectId: 'mocksha' },
+        { name: 'refs/heads/branch', objectId: 'mocksha' },
+        { name: 'refs/heads/feature', objectId: 'mocksha' },
+      ] };
     }
-    return { value: [{ name: 'refs/heads/branch', objectId: 'mocksha' }] };
+    if (url.match(/\/repositories\/[^/]+\?api-version/)) {
+      return { defaultBranch: 'refs/heads/main' };
+    }
+    if (url.includes('/refs?api-version=7.1-preview.1')) {
+      return { value: [{ name: 'refs/heads/feature', objectId: 'mocksha' }] };
+    }
+    return {};
   })
 }));
 
