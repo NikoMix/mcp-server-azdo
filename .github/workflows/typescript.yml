@@ -26,11 +26,13 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Test package
+        run: npm run test
+
   publish:
     runs-on: ubuntu-latest
     needs: [build]
     if: github.event_name == 'release'
-    environment: release
     name: Publish package
 
     permissions:
